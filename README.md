@@ -27,6 +27,7 @@ npm run dev          # vite dev server on :5179 (reads ./data directly)
 ```
 
 ## Public site (GitHub Pages)
+The site is served from the `gh-pages` branch. Rebuild it with `npm run build:pages`, then publish the contents of `site/` at the root of `gh-pages`.
 ```
 npm run snapshot     # data/status.json -> snapshot/status.json (public rules, see below) + sprites
 npm run build:pages  # static build into ./site (relative paths) with the snapshot, then the privacy sweep
