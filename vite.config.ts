@@ -15,7 +15,13 @@ function serviceWorker(): Plugin {
     apply: 'build',
     generateBundle(_opts, bundle) {
       const pub = (dir: string): string[] => readdirSync(`public/${dir}`).map((f) => `${dir}/${f}`);
-      const files = ['./', ...Object.keys(bundle), 'manifest.webmanifest', ...pub('icons'), ...pub('rooms')].filter((f) => !f.endsWith('.map'));
+      let sprites: string[] = [];
+      try {
+        sprites = readdirSync('snapshot/sprites').filter((f) => f.endsWith('.png')).sort().map((f) => `data/sprites/${f}`);
+      } catch {
+        /* snapshot sprites are optional until the public build copies them */
+      }
+      const files = ['./', ...Object.keys(bundle), 'manifest.webmanifest', ...pub('icons'), ...pub('rooms'), ...sprites].filter((f) => !f.endsWith('.map'));
       const version = Date.now().toString(36);
       const src = readFileSync('sw/sw.js', 'utf8').replace('__PRECACHE__', JSON.stringify(files)).replace('__VERSION__', version);
       this.emitFile({ type: 'asset', fileName: 'sw.js', source: src });

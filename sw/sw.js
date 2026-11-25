@@ -1,6 +1,7 @@
 // Jordan AI Village service worker (generated at build time; edit sw/sw.js).
-// App shell + rooms are precached for offline use; the status snapshot is
-// network-first so it is fresh when online and still there when offline.
+// App shell, rooms, and pixel sprites are precached. Status is network-first.
+// Cloudflare Access login redirects are never stored: only a basic 200 that
+// was not redirected may enter the cache. Navigation falls back to that cache.
 const CACHE = 'village-__VERSION__';
 const PRECACHE = __PRECACHE__;
 
@@ -17,26 +18,51 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+function cacheable(res) {
+  return res.type === 'basic' && res.status === 200 && !res.redirected;
+}
+
+async function fromCache(req, isData) {
+  const url = new URL(req.url);
+  const hit = await caches.match(isData ? url.pathname : req, { ignoreSearch: true });
+  if (hit) return hit;
+  if (req.mode === 'navigate') return caches.match('./');
+  return undefined;
+}
+
+async function networkFirst(req) {
+  const url = new URL(req.url);
+  const isData = url.pathname.includes('/data/');
+  try {
+    const res = await fetch(req, { credentials: 'same-origin' });
+    if (cacheable(res)) {
+      const cache = await caches.open(CACHE);
+      await cache.put(isData ? url.pathname : req, res.clone());
+      return res;
+    }
+    // Redirect or non-200: do not cache (an Access login page must not become the app).
+    if (req.mode === 'navigate' || res.redirected) {
+      const cached = await fromCache(req, isData);
+      if (cached) return cached;
+    }
+    return res;
+  } catch {
+    const cached = await fromCache(req, isData);
+    if (cached) return cached;
+    return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/plain' } });
+  }
+}
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin) return;
   const isData = url.pathname.includes('/data/');
   if (isData || req.mode === 'navigate') {
-    // network first, cached copy when offline
-    event.respondWith(
-      fetch(req)
-        .then((res) => {
-          if (res.ok) {
-            const copy = res.clone();
-            const key = isData ? url.pathname : req;
-            caches.open(CACHE).then((c) => c.put(key, copy));
-          }
-          return res;
-        })
-        .catch(() => caches.match(isData ? url.pathname : req, { ignoreSearch: true }).then((r) => r || caches.match('./'))),
-    );
+    event.respondWith(networkFirst(req));
     return;
   }
-  event.respondWith(caches.match(req, { ignoreSearch: true }).then((hit) => hit || fetch(req)));
+  event.respondWith(
+    caches.match(req, { ignoreSearch: true }).then((hit) => hit || fetch(req, { credentials: 'same-origin' })),
+  );
 });

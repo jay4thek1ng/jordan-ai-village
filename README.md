@@ -19,7 +19,7 @@ already leave on the box. No bot writes a status file.
 npm install          # once
 npm run build        # builds the app into ./web
 npm start            # starts the 10-min collector loop + server on http://127.0.0.1:5178/
-npm run shot         # saves /workspace/agent-village-shots/village-YYYY-MM-DD.png (1280x800)
+npm run shot         # saves shots/village-YYYY-MM-DD.png (1280x800)
                      #   --phone (390x844), --name <prefix>, --url "?phase=night"
 npm run check        # typecheck + lint + tests (vitest + python unittest)
 npm run collect      # one collector run by hand
@@ -31,6 +31,7 @@ The site is served from the `gh-pages` branch. Rebuild it with `npm run build:pa
 ```
 npm run snapshot     # data/status.json -> snapshot/status.json (public rules, see below) + sprites
 npm run build:pages  # static build into ./site (relative paths) with the snapshot, then the privacy sweep
+npm run build:cf     # same ./site output, plus site/_headers (no-cache for sw.js and index.html)
 npm run privacy      # sweep ./site: amounts, emails, phones, account/card numbers, tokens, box paths,
                      #   private words, files not on the allowlist, status.json shape; plus repo files for secrets
 ```
@@ -49,7 +50,9 @@ with the exact precache list.
   transposed to 4 wide on portrait phones).
 - `src/rooms.ts` + `src/rooms.css`: the cozy rooms village (default). `src/pixel.ts`: the old pixel town.
 - `collector/collect.py`: read-only scan, writes `data/status.json` and `data/sprites/<id>.png`
-  (24x24, 20-colour pixel sprites made from `/home/box/shared/avatars/<Bot Name>.jpg|png`).
+  (24x24, 20-colour pixel sprites made from the avatars folder). Paths come from
+  `VILLAGE_SHARED`, `VILLAGE_WORKSPACE`, and `VILLAGE_OUT`, or from a git-ignored
+  `collector.local.json` (`shared`, `work`, `out`). Defaults are `local/shared`, `local/work`, and `data`.
   New avatar files are picked up on the next run; bots without one get a marked placeholder.
 - `collector/sanitize.py`: allowlist. Only bot id, sprite path, a fixed activity label, a timestamp
   and service ok/stale/count survive. Muse's free-text status is letters only, max 48 chars,
@@ -72,24 +75,24 @@ with the exact precache list.
 | shared/vault/inbox place notes | Robby | dropped a place note |
 | shared/vault/**/muse-status*.md | Muse | her `status:` line (filtered) |
 | shared/ob-logs/sync.log | header chip | Vault sync ok/stale |
-| shared/vault-mirror/mirror.log | header chip | Drive mirror ok/stale |
-| /workspace/qa-v* | Johnny 5 | tested an app build |
-| /workspace/eas-build-*.json, agent-village/src | Chappie | worked on an app build |
+| shared/vault-mirror/mirror.log | header chip | mirror ok/stale |
+| work/qa-v* | Johnny 5 | tested an app build |
+| work/eas-build-*.json and the app source | Chappie | worked on an app build |
 | data/hooks/routines.json, data/hooks/calls.json | any | routine ran / had a call |
 
 Hooks: `[{"bot": "oracle", "at": "2026-11-24T06:00:00-05:00"}]`. Nothing on the box records routine
 runs or call logs yet, so these are the slot for a future reader.
 
 ## Muse
-Muse drops notes in Drive `01 Household/11 Notes/Vault backup/inbox/`; the vault mirror (every 5 min)
-moves them into `shared/vault/inbox/`. For a status, she drops `muse-status.md` there with:
+Muse drops notes into the shared notes inbox; a mirror copies them into `shared/vault/inbox/`.
+For a status, she leaves `muse-status.md` in that inbox with:
 ```
 ---
 status: Sorting DVDs with Jesse
 updated: 2026-11-24T09:00:00-05:00
 ---
 ```
-Do not put it in the Vault backup root: the mirror's `rclone sync` deletes anything there that isn't local.
+Keep the status file in the inbox. A sync of the inbox root removes files that are not already local.
 
 ## States
 Active (under 1h): glow + speech bubble. Active today: normal. Idle (over 24h or nothing seen): dimmed.

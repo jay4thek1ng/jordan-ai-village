@@ -19,6 +19,13 @@ export function mood(activity: Activity | null | undefined, now: number): Mood {
   return 'idle';
 }
 
+/** Same-origin status read. A login redirect or any non-200 is ignored so it is never treated as village data. */
+export async function fetchStatus(): Promise<unknown | null> {
+  const res = await fetch(`data/status.json?t=${Date.now()}`, { cache: 'no-store', credentials: 'same-origin' });
+  if (!res.ok || res.status !== 200 || res.redirected || res.type === 'opaqueredirect') return null;
+  return res.json();
+}
+
 export function ago(iso: string | null | undefined, now: number): string {
   if (!iso) return 'never';
   const t = Date.parse(iso);

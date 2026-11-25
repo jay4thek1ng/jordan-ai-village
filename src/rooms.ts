@@ -4,7 +4,7 @@
  *  data/status.json (fixed labels and times). Lighting follows real New York time. */
 import './rooms.css';
 import rosterJson from '../roster.json';
-import { PHASE_LABEL, TILE, ago, clock, dayPhase, fitScale, mood, parseStatus, roomLayout, when, type Bridge, type DayPhase, type Mood, type TilePos } from './logic';
+import { PHASE_LABEL, TILE, ago, clock, dayPhase, fetchStatus, fitScale, mood, parseStatus, roomLayout, when, type Bridge, type DayPhase, type Mood, type TilePos } from './logic';
 import type { BotStatus, RosterBot, Status } from './types';
 
 type Motion = 'normal' | 'reduce' | 'static';
@@ -202,8 +202,8 @@ const PHASE_ICON: Record<DayPhase, string> = { day: '☀️', night: '🌙', lat
 
 async function refresh(): Promise<void> {
   try {
-    const res = await fetch(`data/status.json?t=${Date.now()}`, { cache: 'no-store' });
-    if (res.ok) status = parseStatus(await res.json(), ids);
+    const json = await fetchStatus();
+    if (json) status = parseStatus(json, ids);
   } catch {
     // keep the last good status (offline is fine)
   }
@@ -218,8 +218,34 @@ function apply(): void {
   app.style.setProperty('--lab', String(Math.max(1, 0.95 / view.s)));
 }
 
+/** Resolved pixel length of a :root custom property (env(safe-area-inset-*)). */
+function readCssPx(name: string): number {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const direct = parseFloat(raw);
+  if (raw.endsWith('px') && Number.isFinite(direct)) return direct;
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:absolute;visibility:hidden;padding:0;border:0;margin:0';
+  probe.style.paddingTop = `var(${name}, 0px)`;
+  document.documentElement.appendChild(probe);
+  const measured = parseFloat(getComputedStyle(probe).paddingTop);
+  probe.remove();
+  return Number.isFinite(measured) ? measured : 0;
+}
+
 function insets(): { top: number; bottom: number; side: number } {
-  return innerWidth < 600 ? { top: 70, bottom: 74, side: 10 } : { top: 66, bottom: 70, side: 24 };
+  const safeTop = readCssPx('--safe-top');
+  const safeBottom = readCssPx('--safe-bottom');
+  // 70 / 74 clear the time pill and the motion pill; safe-area keeps them off the first row in a standalone PWA.
+  return innerWidth < 600
+    ? { top: 70 + safeTop, bottom: 74 + safeBottom, side: 10 }
+    : { top: 66 + safeTop, bottom: 70 + safeBottom, side: 24 };
+}
+
+function coverViewport(): void {
+  const meta = document.querySelector('meta[name="viewport"]');
+  if (!meta) return;
+  const content = meta.getAttribute('content') ?? '';
+  if (!content.includes('viewport-fit=cover')) meta.setAttribute('content', content ? `${content}, viewport-fit=cover` : 'viewport-fit=cover');
 }
 
 function fit(): void {
@@ -490,6 +516,7 @@ function walkABridge(): void {
 // ---------- start ----------
 
 export async function startRooms(): Promise<void> {
+  coverViewport();
   setMotion(motion);
   buildWorld();
   window.addEventListener('resize', buildWorld);

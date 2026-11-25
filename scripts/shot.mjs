@@ -1,5 +1,5 @@
 // npm run shot: renders the cozy rooms village headless and saves
-//   /workspace/agent-village-shots/village-YYYY-MM-DD.png        (1280x800, the daily screenshot)
+//   shots/village-YYYY-MM-DD.png        (1280x800, the daily screenshot)
 // Options: --phone (390x844 at 3x), --name <prefix> (default "village"),
 //          --url <query, e.g. "?style=pixel">, --static (motion off, the default here).
 // Date is New York time. Fails on any page error or console error.
@@ -13,7 +13,7 @@ const phone = args.includes('--phone');
 const port = Number(process.env.PORT || 5178);
 const query = opt('--url', '?motion=static');
 const url = `http://127.0.0.1:${port}/${query}`;
-const outDir = process.env.SHOT_DIR || '/workspace/agent-village-shots';
+const outDir = process.env.SHOT_DIR || 'shots';
 const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const out = `${outDir}/${opt('--name', 'village')}${phone ? '-phone' : ''}-${day}.png`;
 const chrome = ['/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser'].find(existsSync);

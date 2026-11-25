@@ -1,11 +1,11 @@
 import './style.css';
 import rosterJson from '../roster.json';
 import { paintBuilding, paintGround, paintPlaceholder, rng } from './draw';
-import { WORLD, ago, clock, hit, mood, parseStatus, slotOf, when, type Mood } from './logic';
+import { WORLD, ago, clock, fetchStatus, hit, mood, parseStatus, slotOf, when, type Mood } from './logic';
 import type { BotStatus, RosterBot, Status } from './types';
 
 // The old pixel village builds its own page chrome (opened with ?style=pixel or ?area=chappie).
-document.querySelector('meta[name=viewport]')?.setAttribute('content', 'width=1280');
+document.querySelector('meta[name=viewport]')?.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
 document.body.className = 'pixel';
 document.body.innerHTML = `<header id="top">
       <div class="brand">
@@ -27,10 +27,12 @@ document.body.innerHTML = `<header id="top">
         </div>
       </div>
     </header>
+    <div id="fit">
     <main id="stage">
       <canvas id="world" width="1280" height="720"></canvas>
       <div id="card" hidden></div>
-    </main>`;
+    </main>
+    </div>`;
 
 const roster = rosterJson.bots as RosterBot[];
 const plaza = rosterJson.plaza as [number, number];
@@ -82,10 +84,20 @@ function loadImage(src: string): Promise<HTMLImageElement | null> {
   });
 }
 
+function layoutPixel(): void {
+  const fit = document.getElementById('fit');
+  const stage = document.getElementById('stage');
+  if (!fit || !stage) return;
+  const avail = Math.min(1280, document.body.clientWidth || document.documentElement.clientWidth);
+  const scale = Math.min(1, avail / 1280);
+  stage.style.transform = `scale(${scale})`;
+  fit.style.height = `${720 * scale}px`;
+}
+
 async function refresh(): Promise<void> {
   try {
-    const res = await fetch(`data/status.json?t=${Date.now()}`, { cache: 'no-store' });
-    status = parseStatus(await res.json(), ids);
+    const json = await fetchStatus();
+    if (json) status = parseStatus(json, ids);
   } catch {
     // keep last good status
   }
@@ -333,6 +345,9 @@ function hideCard(): void {
   selected = null;
   card.hidden = true;
 }
+
+layoutPixel();
+window.addEventListener('resize', layoutPixel);
 
 const isChappieArea = new URLSearchParams(location.search).get('area') === 'chappie';
 if (isChappieArea) {
