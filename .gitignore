@@ -1,0 +1,15 @@
+# Local, unsanitized or rebuildable. Only snapshot/ (sanitized, public) is committed.
+node_modules/
+data/
+web/
+site/
+*.log
+*.err
+*.tmp
+__pycache__/
+*.pyc
+.env
+.env.*
+*.keystore
+*.jks
+.DS_Store

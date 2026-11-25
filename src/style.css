@@ -1,0 +1,40 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #2b2f3a; font-family: 'DejaVu Sans', 'Segoe UI', system-ui, sans-serif; color: #2b2b2b; }
+body.pixel { width: 1280px; margin: 0 auto; }
+header { height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; background: #fbf6ea; border-bottom: 4px solid #d8c59a; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 300px; }
+.logo { width: 36px; height: 36px; image-rendering: pixelated; background:
+  linear-gradient(#b04a4a 0 0) 6px 4px / 24px 8px no-repeat,
+  linear-gradient(#efe2c8 0 0) 8px 12px / 20px 18px no-repeat,
+  linear-gradient(#7a4b2b 0 0) 15px 20px / 6px 10px no-repeat,
+  #86b96b; border: 3px solid #3d4a2f; }
+h1 { margin: 0; font-size: 22px; letter-spacing: 0.5px; font-family: 'DejaVu Sans Mono', monospace; font-weight: 800; color: #3d2f1f; }
+.sub { font-size: 12px; color: #6b5d48; margin-top: 2px; }
+.clock { font-family: 'DejaVu Sans Mono', monospace; font-size: 20px; font-weight: 700; color: #3d2f1f; background: #fff; border: 2px solid #d8c59a; padding: 6px 14px; border-radius: 6px; }
+.right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.services { display: flex; gap: 6px; font-size: 11px; }
+.chip { padding: 2px 8px; border-radius: 10px; background: #e6f2dc; color: #2f5b22; border: 1px solid #b7d6a3; }
+.chip.bad { background: #fbe3e1; color: #8a2b22; border-color: #e8b0aa; }
+.legend { display: flex; gap: 12px; font-size: 11px; color: #4a4033; }
+.legend span { display: inline-flex; align-items: center; gap: 4px; }
+.dot { width: 11px; height: 11px; display: inline-block; border-radius: 2px; }
+.dot.active { background: #ffd84a; box-shadow: 0 0 6px 2px #ffd84a; }
+.dot.recent { background: #6fae58; }
+.dot.idle { background: #9a9a9a; opacity: 0.6; }
+.dot.ph { background: #f4efe6; border: 1px dashed #333; }
+.dot.visitor { background: #b07ac4; border: 1px dashed #fff; outline: 1px dashed #b07ac4; }
+#stage { position: relative; width: 1280px; height: 720px; }
+canvas { display: block; image-rendering: pixelated; cursor: default; }
+#card { position: absolute; width: 270px; background: #fffdf7; border: 3px solid #3d2f1f; border-radius: 6px; box-shadow: 4px 4px 0 rgba(0,0,0,0.35); padding: 10px 12px; font-size: 13px; z-index: 5; }
+#card .row { display: flex; gap: 10px; align-items: center; }
+#card img, #card canvas { width: 72px; height: 72px; image-rendering: pixelated; border: 2px solid #3d2f1f; background: #f4efe6; }
+#card h2 { margin: 0; font-size: 17px; font-family: 'DejaVu Sans Mono', monospace; }
+#card .job { color: #5b4f3d; font-size: 12px; margin-top: 2px; }
+#card .place { font-size: 11px; color: #8a7a5f; margin-top: 3px; }
+#card .act { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cdbf9f; }
+#card .act b { display: block; font-size: 11px; color: #8a7a5f; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+#card .note { font-size: 11px; color: #8a7a5f; margin-top: 6px; }
+#card .x { position: absolute; top: 4px; right: 8px; cursor: pointer; font-weight: 700; color: #8a7a5f; }
+
+body.area-chappie { background: #8ec4e8; }
+body.area-chappie canvas { image-rendering: auto; }

@@ -1,0 +1,157 @@
+{
+ "generatedAt": "2026-11-25T10:54:35-05:00",
+ "bots": [
+  {
+   "id": "edith",
+   "sprite": "sprites/edith.png?v=45569",
+   "activity": null
+  },
+  {
+   "id": "oracle",
+   "sprite": "sprites/oracle.png?v=94373",
+   "activity": null
+  },
+  {
+   "id": "skynet",
+   "sprite": "sprites/skynet.png?v=10266",
+   "activity": null
+  },
+  {
+   "id": "vision",
+   "sprite": "sprites/vision.png?v=286",
+   "activity": null
+  },
+  {
+   "id": "bishop",
+   "sprite": "sprites/bishop.png?v=58514",
+   "activity": null
+  },
+  {
+   "id": "tron",
+   "sprite": "sprites/tron.png?v=79848",
+   "activity": null
+  },
+  {
+   "id": "chappie",
+   "sprite": "sprites/chappie.png?v=44364",
+   "activity": {
+    "label": "worked on an app build",
+    "at": "2026-11-25T10:54:08-05:00",
+    "kind": "file"
+   }
+  },
+  {
+   "id": "johnny-5",
+   "sprite": "sprites/johnny-5.png?v=99215",
+   "activity": {
+    "label": "tested an app build",
+    "at": "2026-11-21T07:09:33-05:00",
+    "kind": "file"
+   }
+  },
+  {
+   "id": "sonny",
+   "sprite": "sprites/sonny.png?v=47800",
+   "activity": null
+  },
+  {
+   "id": "ava",
+   "sprite": "sprites/ava.png?v=41854",
+   "activity": null
+  },
+  {
+   "id": "jarvis",
+   "sprite": "sprites/jarvis.png?v=6753",
+   "activity": null
+  },
+  {
+   "id": "tars",
+   "sprite": "sprites/tars.png?v=64385",
+   "activity": {
+    "label": "filed notes in the vault",
+    "at": "2026-11-24T14:19:10-05:00",
+    "kind": "file"
+   }
+  },
+  {
+   "id": "samantha",
+   "sprite": "sprites/samantha.png?v=81202",
+   "activity": {
+    "label": "finished a phone call",
+    "at": "2026-11-21T07:09:13-05:00",
+    "kind": "call"
+   }
+  },
+  {
+   "id": "case",
+   "sprite": "sprites/case.png?v=13160",
+   "activity": {
+    "label": "ran an inbox cleanup",
+    "at": "2026-11-23T16:07:38-05:00",
+    "kind": "routine"
+   }
+  },
+  {
+   "id": "joshua",
+   "sprite": "sprites/joshua.png?v=54655",
+   "activity": null
+  },
+  {
+   "id": "friday",
+   "sprite": "sprites/friday.png?v=66830",
+   "activity": {
+    "label": "refreshed the household snapshot",
+    "at": "2026-11-24T06:59:28-05:00",
+    "kind": "file"
+   }
+  },
+  {
+   "id": "baymax",
+   "sprite": "sprites/baymax.png?v=94408",
+   "activity": null
+  },
+  {
+   "id": "eve",
+   "sprite": "sprites/eve.png?v=14033",
+   "activity": null
+  },
+  {
+   "id": "wall-e",
+   "sprite": "sprites/wall-e.png?v=93608",
+   "activity": null
+  },
+  {
+   "id": "johnny-cab",
+   "sprite": "sprites/johnny-cab.png?v=22317",
+   "activity": null
+  },
+  {
+   "id": "robby",
+   "sprite": "sprites/robby.png?v=24450",
+   "activity": {
+    "label": "updated the places guide",
+    "at": "2026-11-24T11:55:22-05:00",
+    "kind": "file"
+   }
+  },
+  {
+   "id": "gerty",
+   "sprite": "sprites/gerty.png?v=19664",
+   "activity": {
+    "label": "sent a lesson",
+    "at": "2026-11-24T07:45:04-05:00",
+    "kind": "file"
+   }
+  },
+  {
+   "id": "muse",
+   "sprite": null,
+   "activity": {
+    "label": "dropped a note in the vault",
+    "at": "2026-11-24T08:32:58-05:00",
+    "kind": "visitor"
+   }
+  }
+ ],
+ "services": []
+}
