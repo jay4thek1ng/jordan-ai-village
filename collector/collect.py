@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Jordan AI Village status collector.
 
-Read-only scan of what the bots already leave on the box, written out as a
+Read-only scan of what the bots already leave behind, written out as a
 sanitized data/status.json (plus pixel sprites from the avatars folder).
 No bot writes anything for this; no file contents are ever copied out.
 
-Env overrides (used by tests): VILLAGE_SHARED, VILLAGE_WORKSPACE, VILLAGE_OUT.
+Paths come from the environment or a git-ignored collector.local.json
+({"shared", "work", "out"}). Env wins: VILLAGE_SHARED, VILLAGE_WORKSPACE,
+VILLAGE_OUT, and VILLAGE_CONFIG for the config file path. Defaults are
+neutral directories under this repo (local/shared, local/work, data).
 """
 from __future__ import annotations
 
@@ -22,9 +25,36 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sanitize import ROSTER, sanitize_status, safe_muse_text  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-SHARED = os.environ.get("VILLAGE_SHARED", "/home/box/shared")
-WORKSPACE = os.environ.get("VILLAGE_WORKSPACE", "/workspace")
-OUT = os.environ.get("VILLAGE_OUT", os.path.join(ROOT, "data"))
+
+
+def load_roots() -> tuple[str, str, str]:
+    cfg_path = os.environ.get("VILLAGE_CONFIG", os.path.join(ROOT, "collector.local.json"))
+    cfg: dict = {}
+    try:
+        with open(cfg_path, encoding="utf-8") as fh:
+            loaded = json.load(fh)
+        if isinstance(loaded, dict):
+            cfg = loaded
+    except (OSError, ValueError):
+        cfg = {}
+
+    def pick(env: str, key: str, default: str) -> str:
+        env_val = os.environ.get(env)
+        if env_val:
+            return env_val
+        val = cfg.get(key)
+        if isinstance(val, str) and val.strip():
+            return val
+        return default
+
+    return (
+        pick("VILLAGE_SHARED", "shared", os.path.join(ROOT, "local", "shared")),
+        pick("VILLAGE_WORKSPACE", "work", os.path.join(ROOT, "local", "work")),
+        pick("VILLAGE_OUT", "out", os.path.join(ROOT, "data")),
+    )
+
+
+SHARED, WORKSPACE, OUT = load_roots()
 AVATARS = os.path.join(SHARED, "avatars")
 TZ = ZoneInfo("America/New_York")
 NOW = time.time()
@@ -130,7 +160,7 @@ def scan_shared(ev: Events, services: list[dict]) -> None:
     if os.path.isdir(inbox):
         services.append({"id": "vault-inbox", "at": iso(newest_mtime(inbox) or NOW), "ok": True, "count": waiting})
 
-    # Muse's own status file (dropped in Drive "Vault backup/inbox", pulled down by the mirror).
+    # Muse's own status file, copied into the notes inbox by the mirror.
     muse = [p for p in glob.glob(os.path.join(vault, "**", "*.md"), recursive=True)
             if MUSE_STATUS_RE.match(os.path.basename(p))]
     if muse:
@@ -188,7 +218,7 @@ def scan_hooks(ev: Events) -> None:
 
 
 def build_sprites() -> tuple[dict[str, str], list[str]]:
-    """Pixel sprites from /home/box/shared/avatars; new files are picked up on each run."""
+    """Pixel sprites from the avatars folder; new files are picked up on each run."""
     from PIL import Image
 
     os.makedirs(os.path.join(OUT, "sprites"), exist_ok=True)

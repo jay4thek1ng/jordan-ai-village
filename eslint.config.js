@@ -11,6 +11,6 @@ export default tseslint.config(
   },
   {
     files: ['sw/**/*.js'],
-    languageOptions: { globals: { self: 'readonly', caches: 'readonly', fetch: 'readonly', URL: 'readonly', __PRECACHE__: 'readonly' } },
+    languageOptions: { globals: { self: 'readonly', caches: 'readonly', fetch: 'readonly', Response: 'readonly', URL: 'readonly', __PRECACHE__: 'readonly' } },
   },
 );

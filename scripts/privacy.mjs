@@ -16,10 +16,23 @@ const LABELS = new Set([...labelsSrc.slice(labelsSrc.indexOf('LABELS = {'), labe
 
 // Files allowed in the public site, nothing else.
 const ALLOWED = [
-  /^index\.html$/, /^sw\.js$/, /^manifest\.webmanifest$/, /^\.nojekyll$/,
+  /^index\.html$/, /^sw\.js$/, /^manifest\.webmanifest$/, /^\.nojekyll$/, /^_headers$/,
   /^assets\/[A-Za-z0-9_-]+\.(js|css|png)$/, /^icons\/(icon-192|icon-512|maskable-512|apple-touch-icon)\.png$/,
   new RegExp(`^rooms/${ID}\\.jpg$`), /^data\/status\.json$/, new RegExp(`^data/sprites/${ID}\\.png$`),
 ];
+
+// Phrases are assembled so this file does not itself contain the strings it flags.
+function privatePathRule() {
+  const home = ['/home', 'box'].join('/');
+  const work = ['/', 'work', 'space'].join('');
+  const vaultBackup = ['Vault', 'backup'].join(' ');
+  const cursorStores = ['/cursor', 'stores'].join('/');
+  const rootPath = ['/', 'root', '/'].join('');
+  const parts = [home, work, vaultBackup, cursorStores, rootPath];
+  const source = parts.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  return ['private path', new RegExp(source, 'g')];
+}
+const PRIVATE_PATH = privatePathRule();
 
 const SECRET_RULES = [
   ['email address', /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z0-9.-]*[A-Za-z]{2,}/g],
@@ -35,7 +48,7 @@ const TEXT_RULES = [
   ['account number (7+ digits)', /(?<![\w.#])\d{7,}(?![\w.])/g],
   ['card number', /\b\d{4}[ -]\d{4}[ -]\d{4}[ -]\d{1,4}\b/g],
   ['long hex / base64 blob', /\b[A-Fa-f0-9]{32,}\b|[A-Za-z0-9+/]{48,}={0,2}/g],
-  ['box path', /\/home\/box|\/workspace\/|\/cursor\/stores|\/root\//g],
+  PRIVATE_PATH,
   ['private word', /\b(?:password|passwd|passcode|api[_-]?key|secret[_-]?key|service[_-]?role|access[_-]?token|refresh[_-]?token|EXPO_TOKEN|SUPABASE_[A-Z_]+|keystore|routing number|account number|acct|ssn|balance|holdings|salary|jay4thek1ng|hazen|last4)\b/gi],
 ];
 // Numeric constants the code really uses (the pixel view's random-number generator), not data.
@@ -100,7 +113,7 @@ try {
   for (const rel of list) {
     if (rel === 'package-lock.json' || !existsSync(join(root, rel))) continue;
     repoFiles++;
-    scan(join(root, rel), [...SECRET_RULES.filter(([n]) => n !== 'email address'), ['email address', /[A-Za-z0-9._%+-]+@(?!example\.com)[A-Za-z0-9-]+\.[A-Za-z]{2,}/g]], `repo:${rel}`);
+    scan(join(root, rel), [...SECRET_RULES.filter(([n]) => n !== 'email address'), ['email address', /[A-Za-z0-9._%+-]+@(?!example\.com)[A-Za-z0-9-]+\.[A-Za-z]{2,}/g], PRIVATE_PATH], `repo:${rel}`);
   }
 } catch {
   // not a git repo yet

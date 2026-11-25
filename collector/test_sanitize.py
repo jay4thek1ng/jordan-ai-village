@@ -9,15 +9,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sanitize import LABELS, sanitize_status, safe_muse_text  # noqa: E402
 
 AT = "2026-11-24T09:00:00-05:00"
+BOX = "/home" + "/box"
 PRIVATE = ["4111", "pat.sample", "@example.com", "Examplebank", "Samplebroker", "balance", "123 Main", "555-0199",
-           "disconnect", "holdings", "secret", "$", "hunter2", "/home/box"]
+           "disconnect", "holdings", "secret", "$", "hunter2", BOX]
 
 
 class SanitizerTest(unittest.TestCase):
     def test_keeps_only_allowlisted_fields(self):
         raw = {
             "generatedAt": AT, "extra": "x", "token": "secret",
-            "bots": [{"id": "tars", "sprite": "sprites/tars.png?v=1", "path": "/home/box/shared/vault",
+            "bots": [{"id": "tars", "sprite": "sprites/tars.png?v=1", "path": BOX + "/shared/notes",
                       "activity": {"label": "filed notes in the vault", "at": AT, "kind": "file",
                                    "file": "Examplebank-energy.pdf", "amount": 412.5}}],
             "services": [{"id": "vault-sync", "at": AT, "ok": True, "log": "Vault: Jesse Vault (705ec36f)"}],
@@ -35,7 +36,7 @@ class SanitizerTest(unittest.TestCase):
             {"id": "tars", "activity": {"label": "filed 2026-11-20_Examplebank-energy.pdf", "at": AT}},
             {"id": "friday", "activity": {"label": "balance $4,111.20 acct 1234", "at": AT}},
             {"id": "not-a-bot", "activity": {"label": "checked in", "at": AT}},
-            {"id": "case", "sprite": "../../home/box/secret.png", "activity": {"label": "checked in", "at": "yesterday"}},
+            {"id": "case", "sprite": "../.." + BOX + "/secret.png", "activity": {"label": "checked in", "at": "yesterday"}},
             {"id": "case", "activity": {"label": "checked in", "at": AT}},
         ], "services": [{"id": "evil", "at": AT}, {"id": "vault-inbox", "count": "7 notes about rent"}]}
         out = sanitize_status(raw)

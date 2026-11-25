@@ -2,7 +2,7 @@
  *  Opened with ?area=chappie. Leaves the main pixel village unchanged. */
 import portraitUrl from './assets/chappie.png';
 import { rng } from './draw';
-import { ago, clock, mood, parseStatus } from './logic';
+import { ago, clock, fetchStatus, mood, parseStatus } from './logic';
 import type { Activity } from './types';
 
 const ISO_X = 0.92;
@@ -555,8 +555,8 @@ export async function startChappieArea(): Promise<void> {
 
   let activity: Activity | null = null;
   try {
-    const res = await fetch(`data/status.json?t=${Date.now()}`, { cache: 'no-store' });
-    const status = parseStatus(await res.json(), new Set(['chappie']));
+    const json = await fetchStatus();
+    const status = parseStatus(json ?? {}, new Set(['chappie']));
     activity = status.bots.find((b) => b.id === 'chappie')?.activity ?? null;
   } catch {
     // keep empty activity

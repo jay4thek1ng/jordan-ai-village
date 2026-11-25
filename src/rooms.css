@@ -1,4 +1,8 @@
-:root { color-scheme: dark; }
+:root {
+  color-scheme: dark;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #1e1e22; overscroll-behavior: none; }
 body { font-family: ui-rounded, 'SF Pro Rounded', 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif; color: #f4ece0; -webkit-tap-highlight-color: transparent; }
@@ -114,7 +118,7 @@ body { font-family: ui-rounded, 'SF Pro Rounded', 'Nunito', 'Segoe UI', system-u
 .roomview .back { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(12px, env(safe-area-inset-top)); appearance: none; border: 1px solid rgba(255,235,200,.2);
   background: rgba(36,33,38,.9); color: inherit; font: inherit; font-size: 15px; font-weight: 800; padding: 9px 16px; border-radius: 999px; cursor: pointer; }
 .roomview .back:focus-visible { outline: 2px solid #f4d9a8; }
-.room-stage { position: relative; width: min(86vw, calc(100vh - 230px), 760px); aspect-ratio: 1; }
+.room-stage { position: relative; width: min(86vw, calc(100vh - 230px), 760px); width: min(86vw, calc(100dvh - 230px), 760px); aspect-ratio: 1; }
 .room-stage .art { position: absolute; inset: 0; }
 .room-stage .zzz { font-size: 40px; }
 .roomview .card { width: min(92vw, 560px); text-align: center; }
